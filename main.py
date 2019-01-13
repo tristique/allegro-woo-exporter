@@ -8,10 +8,15 @@ import re
 
 # normal mode - set to 0
 # test mode - program will loop only X items
-test_mode = 10
+test_mode = 5
 user = 'allora_pl'
 
 site_main = 'https://allegro.pl/uzytkownik/' + user
+
+# for test mode
+if test_mode != 0:
+    print('RUNNING IN TEST MODE - ONLY ' + str(test_mode) + ' ITEMS WILL BE FETCHED')
+
 print ('Address: ' + site_main)
 
 res = requests.get(site_main)
@@ -26,6 +31,12 @@ print('Pages: ' + str(pages))
 # for test mode
 if test_mode != 0:
     pages = 1
+    
+
+output = open('C:\\Users\\trist\\Desktop\\allegro_output.csv','w+')
+output.write('tax:product_type;post_title;category;post_content;regular_price;manage_stock;stock;stock_status;images\n')
+
+# get product subpages, 60 items per subpage by default
 
 for x in range(0, int(pages)):
     subpage = site_main + '?p=' + str(x+1)
@@ -34,6 +45,8 @@ for x in range(0, int(pages)):
     content_subpage = lxml.html.fromstring(res.content)
     print('  Content: ' + str(content_subpage))
     items = content_main.xpath('.//article/div/div/div[1]/div/div[1]/a/@href')
+
+    # for every item get required data: title, description, images etc.
 
     # for test mode
     if test_mode != 0:
@@ -49,7 +62,7 @@ for x in range(0, int(pages)):
         # print('      Content: ' + str(content_item))
 
         item = content_item.xpath('//div[3]/div/div/div[7]/div/div/div/div/div/div/div/span[2]/text()')[0]
-        print('Item ' + item, end='')
+        print('   Item ' + item, end='')
 
         title = content_item.xpath('.//div[2]/h1/text()')[0].capitalize()
         # print(title)
@@ -61,7 +74,7 @@ for x in range(0, int(pages)):
 
         price1 = content_item.xpath('//div[2]/div[@class="_464ce600"]/div[1]/text()')
         price2 = content_item.xpath('//div[2]/div[@class="_464ce600"]/div[1]/span/text()')
-        price = float(price1[0] + '.' + price2[0])
+        price = str(float(price1[0] + '.' + price2[0]))
         # print(price)
         print('.', end='')
 
@@ -75,14 +88,18 @@ for x in range(0, int(pages)):
         for image in images:
             # print(image)
             print('.', end='')
+            images_full =  '|'.join(images)
 
         descriptions = content_item.xpath('//*[@id="user_field"]/article/div/section/div/section/p/b/text()')
         for description in descriptions:
             # print(description)
             print('.', end='')
+            desc_full =  ' '.join(descriptions)
         print('.')
 
-        # then put everything in csv output file
-		# https://docs.woocommerce.com/document/product-csv-import-suite-column-header-reference/
-
-
+        # then put item's data into csv output file
+	# https://docs.woocommerce.com/document/product-csv-import-suite-column-header-reference/
+        #output.write('tax:product_type;post_title;category;post_content;regular_price;manage_stock;stock;stock_status;images')
+        output.write('simple' + ';' + title + ';' + category + ';' + desc_full + ';' + price + ';' + 'yes' + ';' + amount + ';' + 'instock' + ';' + images_full + '\n')
+output.close()
+print('Finished.')
