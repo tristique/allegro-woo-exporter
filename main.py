@@ -8,7 +8,7 @@ import re
 
 # normal mode - set to 0
 # test mode - program will loop only X items
-test_mode = 5
+test_mode = 0
 user = 'allora_pl'
 
 site_main = 'https://allegro.pl/uzytkownik/' + user
@@ -25,7 +25,9 @@ content_main = lxml.html.fromstring(res.content)
 print('Content: ' + str(content_main))
 # sample site from https://www.ipeen.com.tw/comment/778246
 # name = doc.xpath(".//meta[@itemprop='name']/@content")
-pages = content_main.xpath('.//div[4]/div/div/div/span[@class="m-pagination__text"]/text()')[0]
+# changed
+# pages = content_main.xpath('.//div[4]/div/div/div/span[@class="m-pagination__text"]/text()')[0]
+pages = content_main.xpath('.//div[3]/div/div/div/div/div/div[2]/div[1]/div[2]/div[3]/div/div/div/div/span[@class="m-pagination__text"]/text()')[0]
 print('Pages: ' + str(pages))
 
 # for test mode
@@ -38,11 +40,12 @@ output.write('tax:product_type;post_title;category;post_content;regular_price;ma
 # get product subpages, 60 items per subpage by default
 for x in range(0, int(pages)):
     subpage = site_main + '?p=' + str(x+1)
-    print(' Subpage: ' + subpage)
+    # print(' Subpage: ' + subpage)
     res = requests.get(subpage)
     content_subpage = lxml.html.fromstring(res.content)
     print('  Content: ' + str(content_subpage))
     items = content_main.xpath('.//article/div/div/div[1]/div/div[1]/a/@href')
+    # print(items)
 
     # example item url: https://allegro.pl/oferta/woreczki-we-wzorki-opakowania-do-bizuterii-6x8cm-7622161189
     # for every item url get required data: title, description, images etc.
@@ -67,16 +70,20 @@ for x in range(0, int(pages)):
         item = item_url[-10:]
         print('   Item ' + item, end='')
 
-        title = content_item.xpath('.//div[2]/h1/text()')[0].capitalize()
-        # print(title)
+        # changed
+        # title = content_item.xpath('.//div[2]/h1/text()')[0].capitalize()
+        title = content_item.xpath('.//div[3]/h1/text()')[0].capitalize()        
         print('.', end='')
 
         category = content_item.xpath('.//div/div/div[1]/div/div/div/div/div/div[5]/a/span/text()')[0].lower()
         # print(category)
         print('.', end='')
 
-        price1 = content_item.xpath('//div[2]/div[@class="_48f2850d"]/div[1]/text()')
-        price2 = content_item.xpath('//div[2]/div[@class="_48f2850d"]/div[1]/span/text()')
+        # changed
+        # price1 = content_item.xpath('//div[2]/div[@class="_48f2850d"]/div[1]/text()')
+        price1 = content_item.xpath('//div/div/div/div/div/div/div[2]/div[@class="a08bbb79"]/div[1]/text()[1]')
+        # price2 = content_item.xpath('//div[2]/div[@class="_48f2850d"]/div[1]/span/text()')
+        price2 = content_item.xpath('//div/div/div/div/div/div/div[2]/div[@class="a08bbb79"]/div[1]/span/text()[1]')
         price = str(float(price1[0] + '.' + price2[0]))
         # print(price)
         print('.', end='')
