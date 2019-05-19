@@ -25,8 +25,6 @@ content_main = lxml.html.fromstring(res.content)
 print('Content: ' + str(content_main))
 # sample site from https://www.ipeen.com.tw/comment/778246
 # name = doc.xpath(".//meta[@itemprop='name']/@content")
-# changed
-# pages = content_main.xpath('.//div[4]/div/div/div/span[@class="m-pagination__text"]/text()')[0]
 pages = content_main.xpath('.//div[3]/div/div/div/div/div/div[2]/div[1]/div[2]/div[3]/div/div/div/div/span[@class="m-pagination__text"]/text()')[0]
 print('Pages: ' + str(pages))
 
@@ -70,8 +68,6 @@ for x in range(0, int(pages)):
         item = item_url[-10:]
         print('   Item ' + item, end='')
 
-        # changed
-        # title = content_item.xpath('.//div[2]/h1/text()')[0].capitalize()
         title = content_item.xpath('.//div[3]/h1/text()')[0].capitalize()        
         print('.', end='')
 
@@ -79,10 +75,7 @@ for x in range(0, int(pages)):
         # print(category)
         print('.', end='')
 
-        # changed
-        # price1 = content_item.xpath('//div[2]/div[@class="_48f2850d"]/div[1]/text()')
         price1 = content_item.xpath('//div/div/div/div/div/div/div[2]/div[@class="a08bbb79"]/div[1]/text()[1]')
-        # price2 = content_item.xpath('//div[2]/div[@class="_48f2850d"]/div[1]/span/text()')
         price2 = content_item.xpath('//div/div/div/div/div/div/div[2]/div[@class="a08bbb79"]/div[1]/span/text()[1]')
         price = str(float(price1[0] + '.' + price2[0]))
         # print(price)
